@@ -226,6 +226,5 @@ int processEvents(SDL_Window *window, Cursor *reticule, testCube *collider, Game
   {
       printf("HIT HIT!\n");
   }*/
-
   return done;
 };

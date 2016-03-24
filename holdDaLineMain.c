@@ -51,21 +51,28 @@ typedef struct
   Solider rightGunner;
   int fireStart;
 
+  //Font and Textures
+  TTF_Font *font;
+  SDL_Texture *titleBlocText;
+  SDL_Texture *soliderRedText;
+
   //Gunfire timers
-  //DEBUG
   clock_t lastFireLeft;
   clock_t nowFireLeft;
 
   clock_t lastFire;
   clock_t nowFire;
 
-  //DEBUG
   clock_t lastFireRight;
   clock_t nowFireRight;
 
   //Kraut Spawn timers
   clock_t lastkrtSpawn;
   clock_t nowkrtSpawn;
+
+  //Blinking Start Prompt
+  clock_t blinkStart;
+  clock_t blinkNow;
 
 }Gamestate;
 
@@ -95,18 +102,12 @@ int main(int argc, char *argv[])
                               SDL_WINDOWPOS_UNDEFINED,  // Initial y position
                               320,                      // Width in pixels
                               240,                      // Height in pixels
-                              0                         // Flags
-                              //SDL_WINDOW_FULLSCREEN
+                              //0                         // Flags
+                              SDL_WINDOW_FULLSCREEN
                               );
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
     testScreenSize();
-
-    //TITLE SCREEN
-    //titleScreen(renderer, window);
-
-    //LOADING SCREEN
-    loadingScreen(renderer, window);
 
     //DEBUG Cursor
     Cursor reticule;
@@ -119,20 +120,31 @@ int main(int argc, char *argv[])
     collider.y = 40.0;
 
     Gamestate game;
-    loadGamestate(&game);
+    loadGamestate(&game, renderer);
 
-    // MAIN GAME LOOP
+    //-----TITLE SCREEN LOOP-----//
+    int gameStart = 0;
+    titleScreen(renderer, window);
+    //DEBUG LOADING SCREEN
+    //loadingScreen(renderer, window, &game);
+    while(!gameStart)
+    {
+        gameStart = gameStartTrig();
+        gameStartRend(renderer, &game);
+    };
+
+    //-----MAIN GAME LOOP-----//
     int done = 0;
     while(!done)
     {
-        //Check for events
         done = processEvents(window, &reticule, &collider, &game);
         doRender(renderer, &reticule, &collider, &game);
     };
 
-    SDL_Delay(2000);
+    //SDL_Delay(2000);
 
     //End Processes
+    dumpGamestate(&game);
     SDL_DestroyWindow(window);
     SDL_DestroyRenderer(renderer);
     TTF_Quit();
@@ -147,4 +159,7 @@ int main(int argc, char *argv[])
     redScreen(renderer, window);
     //GAME SCREEN
     gameScreen(renderer, window);
+
+    //LOADING SCREEN
+    //loadingScreen(renderer, window);
 */

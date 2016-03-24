@@ -23,33 +23,128 @@ void testScreenSize()
 -----------------------------------------------------*/
 void titleScreen(SDL_Renderer *renderer, SDL_Window *window)
 {
-  //Make type
-  TTF_Font *font;
-  char *fontPath = SDL_GetBasePath();
-  strcat(fontPath, "fonts/Crazy-Pixel.ttf");
-  font = TTF_OpenFont(fontPath, 48);
-
-  SDL_Color red = {255, 0, 0, 255};
-  SDL_Surface *temp = TTF_RenderText_Blended(font,"Hold Da Line",red);
-
-  SDL_Texture *label;
-  label = SDL_CreateTextureFromSurface(renderer, temp);
-  SDL_FreeSurface(temp);
-
-  //Set Background to White
-  SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+  //---------CLEAR SCREEN TO RED--------//
+  SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
   SDL_RenderClear(renderer);
 
-  //Set Text to Screen
-  SDL_Rect textRect = {30, 80, 150, 80};
-  SDL_RenderCopy(renderer, label, NULL, &textRect);
+  //---------TITLE SPRITE LOAD--------//
+  //path title
+  char *titlePath = SDL_GetBasePath();
+  strcat(titlePath, "pngs/hdlTitle.png");
 
+  //surface load
+  SDL_Surface *titleBloc = NULL;
+  titleBloc = IMG_Load(titlePath);
+
+  //surface to texture load
+  SDL_Texture *titleBlocText;
+  titleBlocText = SDL_CreateTextureFromSurface(renderer, titleBloc);
+
+  //create rect and add texture to it
+  SDL_Rect titleBlocRect = { 50, 13, 230, 98};
+  SDL_RenderCopy(renderer, titleBlocText, NULL, &titleBlocRect);
+
+
+  //---------DUAL SOLIDER SPRITE LOAD--------//
+  //path solider
+  char *soliderPath = SDL_GetBasePath();
+  strcat(soliderPath, "pngs/soliderDuo.png");
+
+  //surface load
+  SDL_Surface *soliderRed = NULL;
+  soliderRed = IMG_Load(soliderPath);
+
+  //surface to texture load
+  SDL_Texture *soliderRedText;
+  soliderRedText = SDL_CreateTextureFromSurface(renderer, soliderRed);
+
+  //create rect and add texture to it
+  SDL_Rect soliderRedRect = { 0, 121, 320, 119};
+  SDL_RenderCopy(renderer, soliderRedText, NULL, &soliderRedRect);
+
+   //---------PRESENT STEP--------//
+  //present
   SDL_RenderPresent(renderer);
+
+  //Title Screen Pause
   SDL_Delay(2000);
 
-  //End Processes
-  SDL_DestroyTexture(label);
+  //free surfaces
+  SDL_FreeSurface(soliderRed);
+  SDL_DestroyTexture(soliderRedText);
+  SDL_FreeSurface(titleBloc);
+  SDL_DestroyTexture(titleBlocText);
 }
+
+/*-----------------------------------------------------
+        GAMESTARTTRIG
+-----------------------------------------------------*/
+int gameStartTrig()
+{
+    SDL_Event event;
+    int gameOn = 0;
+
+    while(SDL_PollEvent(&event))
+    {
+        switch(event.type)
+        {
+            case SDL_KEYDOWN:
+            {
+                gameOn = 1;
+            }
+            break;
+        }
+    }
+
+    return gameOn;
+};
+
+/*-----------------------------------------------------
+        GAME_START_REND
+-----------------------------------------------------*/
+void gameStartRend(SDL_Renderer *renderer, Gamestate *game)
+{
+    //clear screen to red
+    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+    SDL_RenderClear(renderer);
+
+    //render title block text
+    SDL_Rect titleBlocRect = { 50, 13, 230, 98};
+    SDL_RenderCopy(renderer, game->titleBlocText, NULL, &titleBlocRect);
+
+    //render solider duo
+    SDL_Rect soliderRedRect = { 0, 121, 320, 119};
+    SDL_RenderCopy(renderer, game->soliderRedText, NULL, &soliderRedRect);
+
+    //Press start key
+    SDL_Color white = {255, 255, 255, 255};
+    SDL_Surface *temp;
+
+    game->blinkNow = clock();
+    float diff = ((float)(game->blinkNow - game->blinkStart) / 1000000.0F ) * 1000;
+    if(diff > 0.5)
+    {
+        temp = TTF_RenderText_Blended(game->font,"Press Any Key",white);
+
+        //Update time
+        if(diff > 1.25)
+            game->blinkStart = game->blinkNow;
+    }
+    else
+    {
+        temp = TTF_RenderText_Blended(game->font," ",white);
+    }
+
+    SDL_Texture *label;
+    label = SDL_CreateTextureFromSurface(renderer, temp);
+    SDL_FreeSurface(temp);
+
+    SDL_Rect textRect = {30, 80, 150, 80};
+    SDL_RenderCopy(renderer, label, NULL, &textRect);
+
+    SDL_RenderPresent(renderer);
+
+};
 
 /*-----------------------------------------------------
         REDSCREEN
@@ -121,16 +216,16 @@ int collide2d(float x1, float y1, float x2, float y2, float wt1, float ht1, floa
 /*-----------------------------------------------------
         LOADINGSCREEN
 -----------------------------------------------------*/
-void loadingScreen(SDL_Renderer *renderer, SDL_Window *window){
+void loadingScreen(SDL_Renderer *renderer, SDL_Window *window, Gamestate *game){
 
   //Make type
-  TTF_Font *font;
+  /*TTF_Font *font;
   char *fontPath = SDL_GetBasePath();
   strcat(fontPath, "fonts/Crazy-Pixel.ttf");
-  font = TTF_OpenFont(fontPath, 48);
+  font = TTF_OpenFont(fontPath, 48);*/
 
   SDL_Color white = {255, 255, 255, 255};
-  SDL_Surface *temp = TTF_RenderText_Blended(font,"LOADING",white);
+  SDL_Surface *temp = TTF_RenderText_Blended(game->font,"SpunkWar",white);
 
   SDL_Texture *label;
   label = SDL_CreateTextureFromSurface(renderer, temp);
@@ -225,9 +320,9 @@ void removeBullet(int k, Bullet *bulletArray[])
 
 
 /*-----------------------------------------------------
-        LOADGAMESTATE
+        LOAD_GAME_STATE
 -----------------------------------------------------*/
-void loadGamestate(Gamestate *game)
+void loadGamestate(Gamestate *game, SDL_Renderer *renderer)
 {
     //Setup Gunner positions
     game->leftGunner.x = 5;
@@ -245,8 +340,47 @@ void loadGamestate(Gamestate *game)
     game->rightGunner.name = "rightGun";
     game->rightGunner.selected = 0;
 
+    //Load Font
+    char *fontPath = SDL_GetBasePath();
+    strcat(fontPath, "fonts/Crazy-Pixel.ttf");
+    game->font = TTF_OpenFont(fontPath, 48);
+
+    //DEBUG Load Char Sprites
+    //Title
+    char *titlePath = SDL_GetBasePath();
+    strcat(titlePath, "pngs/hdlTitle.png");
+
+    SDL_Surface *titleBloc = NULL;
+    titleBloc = IMG_Load(titlePath);
+
+    game->titleBlocText = SDL_CreateTextureFromSurface(renderer, titleBloc);
+    SDL_FreeSurface(titleBloc);
+
+    //Solider
+    char *soliderPath = SDL_GetBasePath();
+    strcat(soliderPath, "pngs/soliderDuo.png");
+
+    SDL_Surface *soliderRed = NULL;
+    soliderRed = IMG_Load(soliderPath);
+
+    game->soliderRedText = SDL_CreateTextureFromSurface(renderer, soliderRed);
+    SDL_FreeSurface(soliderRed);
+
+
+
     game->lastFireLeft = clock();
     game->lastFire = clock();
     game->lastFireRight = clock();
     game->lastkrtSpawn = clock();
+
+    game->blinkStart = clock();
+};
+
+/*-----------------------------------------------------
+        DUMP_GAME_STATE
+-----------------------------------------------------*/
+void dumpGamestate(Gamestate *game)
+{
+    SDL_DestroyTexture(game->titleBlocText);
+    SDL_DestroyTexture(game->soliderRedText);
 };
