@@ -9,7 +9,7 @@ void testScreenSize();
 void titleScreen(SDL_Renderer *renderer, SDL_Window *window);
 
 /*Wait for Game Start Loop*/
-int gameStartTrig();
+int gameStartTrig(Gamestate *game);
 
 /*Game Start Render*/
 void gameStartRend(SDL_Renderer *renderer, Gamestate *game);

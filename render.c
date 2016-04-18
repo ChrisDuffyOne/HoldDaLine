@@ -61,9 +61,28 @@ void doRender(SDL_Renderer *renderer, Cursor *reticule, testCube *testBox, Games
     //main kraut render
     for(int i=0; i< MAX_KRAUTS; i++) if(krauts[i])
     {
-        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+        if(krauts[i]->inRange == 1 && krauts[i]->willFire == 1)
+            SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+        else
+            SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
         SDL_Rect krautRun = { krauts[i]->x, krauts[i]->y, 20, 20};
         SDL_RenderFillRect(renderer, &krautRun);
+    };
+
+    //main tank render
+    for(int i=0; i< MAX_TANKS; i++) if(tanks[i])
+    {
+        SDL_SetRenderDrawColor(renderer, 163, 44, 184, 255);
+        SDL_Rect tankRun = { tanks[i]->x, tanks[i]->y, 60, 20};
+        SDL_RenderFillRect(renderer, &tankRun);
+    };
+
+    //DEBUG germanbullets render
+    for(int i=0; i<MAX_BULLETS;i++) if(germanBullets[i])
+    {
+        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+        SDL_Rect bulletTry = { germanBullets[i]->x, germanBullets[i]->y, 2, 2};
+        SDL_RenderFillRect(renderer, &bulletTry);
     };
 
     //We are done drawing, "present" or show to the screen what we've drawn

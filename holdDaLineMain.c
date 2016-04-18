@@ -2,10 +2,13 @@
 #include <SDL.h>
 #include <SDL_ttf.h>
 #include <time.h>
+//DEBUG
+#include <stdlib.h>
 
 //-------------PROTOTYPE STRUCTS-----------------//
 #define MAX_BULLETS 100
 #define MAX_KRAUTS 100
+#define MAX_TANKS 1
 
 typedef struct
 {
@@ -19,8 +22,20 @@ typedef struct
    float x;
    float y;
    float dx;
+   int inRange;
+   int isFire; //Whenever Kraut enters a killzone will run a test to see if kraut will fire. Once run isFire will prevent it from running again
+   int willFire; //Indicates if Kraut will fire
    int dead;
 }Kraut;
+
+typedef struct
+{
+   float x;
+   float y;
+   float dx;
+   int life;
+   int dead;
+}Tank;
 
 typedef struct
 {
@@ -56,6 +71,16 @@ typedef struct
   SDL_Texture *titleBlocText;
   SDL_Texture *soliderRedText;
 
+  //Animation Data for titleBloc and SoliderRed
+  float titleY;
+  float titleDX;
+
+  float soliderRedY;
+  float soliderRedDX;
+
+  //Indicates that the title Screen animation is not yet done
+  int introFin;
+
   //Gunfire timers
   clock_t lastFireLeft;
   clock_t nowFireLeft;
@@ -70,6 +95,10 @@ typedef struct
   clock_t lastkrtSpawn;
   clock_t nowkrtSpawn;
 
+  //DEBUG Tank Spawn timers
+  clock_t lastTankSpawn;
+  clock_t nowTankSpawn;
+
   //Blinking Start Prompt
   clock_t blinkStart;
   clock_t blinkNow;
@@ -81,6 +110,8 @@ Bullet *bulletsLeft[MAX_BULLETS] = {NULL};
 Bullet *bullets[MAX_BULLETS] = {NULL};
 Bullet *bulletsRight[MAX_BULLETS] = {NULL};
 Kraut *krauts[MAX_KRAUTS] = {NULL};
+Tank *tanks[MAX_TANKS] = {NULL};
+Bullet *germanBullets[MAX_BULLETS] = {NULL};
 
 #include "functions.h"
 #include "render.h"
@@ -102,14 +133,16 @@ int main(int argc, char *argv[])
                               SDL_WINDOWPOS_UNDEFINED,  // Initial y position
                               320,                      // Width in pixels
                               240,                      // Height in pixels
-                              //0                         // Flags
-                              SDL_WINDOW_FULLSCREEN
+                              0                         // Flags
+                              //SDL_WINDOW_FULLSCREEN
                               );
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
     testScreenSize();
+    //DEBUG
+    srand(time(NULL));
 
-    //DEBUG Cursor
+    //Cursor
     Cursor reticule;
     reticule.x = 160.0;
     reticule.y = 120.0;
@@ -124,12 +157,9 @@ int main(int argc, char *argv[])
 
     //-----TITLE SCREEN LOOP-----//
     int gameStart = 0;
-    titleScreen(renderer, window);
-    //DEBUG LOADING SCREEN
-    //loadingScreen(renderer, window, &game);
     while(!gameStart)
     {
-        gameStart = gameStartTrig();
+        gameStart = gameStartTrig(&game);
         gameStartRend(renderer, &game);
     };
 
@@ -162,4 +192,8 @@ int main(int argc, char *argv[])
 
     //LOADING SCREEN
     //loadingScreen(renderer, window);
+
+    //titleScreen(renderer, window);
+    //DEBUG LOADING SCREEN
+    //loadingScreen(renderer, window, &game);
 */
