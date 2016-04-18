@@ -14,7 +14,9 @@ void doRender(SDL_Renderer *renderer, Cursor *reticule, testCube *testBox, Games
 
     //left solider render
     SDL_Rect leftGunner = { game->leftGunner.x, game->leftGunner.y, 8, 8};
-    if(game->leftGunner.selected == 1)
+    if(game->leftGunner.health <= 0)
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); //set the drawing color to white
+    else if(game->leftGunner.selected == 1)
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); //set the drawing color to red
     else
         SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);  //set the drawing color to blue
@@ -22,7 +24,9 @@ void doRender(SDL_Renderer *renderer, Cursor *reticule, testCube *testBox, Games
 
     //main solider render
     SDL_Rect mainGunner = { game->mainGunner.x, game->mainGunner.y, 8, 8};
-    if(game->mainGunner.selected == 1)
+    if(game->mainGunner.health <= 0)
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); //set the drawing color to white
+    else if(game->mainGunner.selected == 1)
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); //set the drawing color to red
     else
         SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);  //set the drawing color to blue
@@ -30,7 +34,9 @@ void doRender(SDL_Renderer *renderer, Cursor *reticule, testCube *testBox, Games
 
     //right solider render
     SDL_Rect rightGunner = { game->rightGunner.x, game->rightGunner.y, 8, 8};
-    if(game->rightGunner.selected == 1)
+    if(game->rightGunner.health <= 0)
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); //set the drawing color to white
+    else if(game->rightGunner.selected == 1)
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); //set the drawing color to red
     else
         SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);  //set the drawing color to blue
@@ -61,11 +67,12 @@ void doRender(SDL_Renderer *renderer, Cursor *reticule, testCube *testBox, Games
     //main kraut render
     for(int i=0; i< MAX_KRAUTS; i++) if(krauts[i])
     {
-        if(krauts[i]->inRange == 1 && krauts[i]->willFire == 1)
+        if(krauts[i]->willFire == 1)
             SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
         else
             SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
         SDL_Rect krautRun = { krauts[i]->x, krauts[i]->y, 20, 20};
+        //SDL_Rect krautRun = { krauts[i]->x-10, krauts[i]->y, 20, 20};
         SDL_RenderFillRect(renderer, &krautRun);
     };
 

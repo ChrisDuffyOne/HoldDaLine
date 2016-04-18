@@ -55,6 +55,7 @@ typedef struct
   int x;
   int y;
   char *name;
+  int health;
   int selected;
   int gunFired;
 }Solider;

@@ -403,21 +403,22 @@ void removeBullet(int k, Bullet *bulletArray[])
 void loadGamestate(Gamestate *game, SDL_Renderer *renderer)
 {
     //Setup Gunner positions
-    //game->leftGunner.x = 5;
-    game->leftGunner.x = 25;
+    game->leftGunner.x = 50; //25
     game->leftGunner.y = 230;
     game->leftGunner.name = "leftGun";
+    game->leftGunner.health = 3;
     game->leftGunner.selected = 0;
 
     game->mainGunner.x = 160;
     game->mainGunner.y = 230;
     game->mainGunner.name = "mainGun";
+    game->mainGunner.health = 3;
     game->mainGunner.selected = 1;
 
-    //game->rightGunner.x = 315;
-    game->rightGunner.x = 295;
+    game->rightGunner.x = 270; //295
     game->rightGunner.y = 230;
     game->rightGunner.name = "rightGun";
+    game->rightGunner.health = 3;
     game->rightGunner.selected = 0;
 
     //Load Font

@@ -42,7 +42,7 @@ int processEvents(SDL_Window *window, Cursor *reticule, testCube *collider, Game
   if(state[SDL_SCANCODE_LEFT])
   {
     reticule->x -= 1.0;
-    printf("Cursor x: %f \n", reticule->x);
+    //printf("Cursor x: %f \n", reticule->x);
     game->leftGunner.selected = 1;
     game->mainGunner.selected = 0;
     game->rightGunner.selected = 0;
@@ -50,7 +50,7 @@ int processEvents(SDL_Window *window, Cursor *reticule, testCube *collider, Game
   if(state[SDL_SCANCODE_RIGHT])
   {
     reticule->x += 1.0;
-    printf("Cursor x: %f \n", reticule->x);
+    //printf("Cursor x: %f \n", reticule->x);
     game->leftGunner.selected = 0;
     game->mainGunner.selected = 0;
     game->rightGunner.selected = 1;
@@ -58,12 +58,12 @@ int processEvents(SDL_Window *window, Cursor *reticule, testCube *collider, Game
   if(state[SDL_SCANCODE_UP])
   {
     reticule->y -= 1.0;
-    printf("Cursor y: %f \n", reticule->y);
+    //printf("Cursor y: %f \n", reticule->y);
   }
   if(state[SDL_SCANCODE_DOWN])
   {
      reticule->y += 1.0;
-     printf("Cursor y: %f \n", reticule->y);
+     //printf("Cursor y: %f \n", reticule->y);
   }
   if(!state[SDL_SCANCODE_LEFT] && !state[SDL_SCANCODE_RIGHT])
   {
@@ -79,7 +79,8 @@ int processEvents(SDL_Window *window, Cursor *reticule, testCube *collider, Game
     float diff = ((float)(game->nowFireLeft - game->lastFireLeft) / 1000000.0F ) * 1000;
     if(diff > 1.00)
     {
-        addBullet(7.0, 230.0, &bulletsLeft);
+        //addBullet(7.0, 230.0, &bulletsLeft);
+        addBullet(game->leftGunner.x+4, 230.0, &bulletsLeft);
         game->lastFireLeft = game->nowFireLeft;
     };
   }
@@ -111,7 +112,8 @@ int processEvents(SDL_Window *window, Cursor *reticule, testCube *collider, Game
     float diff = ((float)(game->nowFireRight - game->lastFireRight) / 1000000.0F ) * 1000;
     if(diff > 1.00)
     {
-        addBullet(316.0, 230.0, &bulletsRight);
+        //addBullet(316.0, 230.0, &bulletsRight);
+        addBullet(game->rightGunner.x+4, 230.0, &bulletsRight);
         game->lastFireRight = game->nowFireRight;
     };
   }
@@ -145,53 +147,78 @@ int processEvents(SDL_Window *window, Cursor *reticule, testCube *collider, Game
     spawnTank(320.0, 34.0);
   }
 
-  //---------------------------- DEBUG Enemy Behavior ----------------------------//
+  //---------------------------- Enemy Behavior ----------------------------//
 
   //Kraut Solider Behavior
   for(int i=0; i<MAX_KRAUTS;i++) if(krauts[i])
   {
     int randomNum = rand() % 100;
 
-    //Kraut In Range
-    if(krauts[i]->x > game->leftGunner.x-25 && krauts[i]->x < game->leftGunner.x+25 ||
-       krauts[i]->x > game->mainGunner.x-25 && krauts[i]->x < game->mainGunner.x+25 ||
-       krauts[i]->x > game->rightGunner.x-25 && krauts[i]->x < game->rightGunner.x+25)
+    //Left Gunner Fire Check
+    if(krauts[i]->x > game->leftGunner.x-25 && krauts[i]->x < game->leftGunner.x+25)
     {
-        krauts[i]->inRange = 1;
+        //Fire Test
+        if(krauts[i]->isFire == 0){
+            if(randomNum <= 25){
+                krauts[i]->willFire = 1;
+                krauts[i]->isFire = 1;
+            }
+        }
+        krauts[i]->isFire = 1;
+        //Fire Round
+        if(krauts[i]->willFire == 1){
+            krauts[i]->dx = 0.5;
+            if(krauts[i]->x == game->leftGunner.x){
+                addBullet(krauts[i]->x, krauts[i]->y, &germanBullets);
+            };
+        };
     }
+    //Main Gunner Fire Check
+    else if(krauts[i]->x > game->mainGunner.x-25 && krauts[i]->x < game->mainGunner.x+25)
+    {
+        //Fire Test
+        if(krauts[i]->isFire == 0){
+            if(randomNum <= 25){
+                krauts[i]->willFire = 1;
+                krauts[i]->isFire = 1;
+            };
+        };
+        krauts[i]->isFire = 1;
+        //Fire Round
+        if(krauts[i]->willFire == 1){
+            krauts[i]->dx = 2.0;
+            if(krauts[i]->x == game->mainGunner.x){
+                addBullet(krauts[i]->x, krauts[i]->y, &germanBullets);
+            };
+        };
+    }
+    //Right Gunner Fire Check
+    else if(krauts[i]->x > game->rightGunner.x-25 && krauts[i]->x < game->rightGunner.x+25)
+    {
+        //Fire Test
+        if(krauts[i]->isFire == 0){
+            if(randomNum <= 25){
+                krauts[i]->willFire = 1;
+                krauts[i]->isFire = 1;
+            }
+        }
+        krauts[i]->isFire = 1;
+        //Fire Round
+        if(krauts[i]->willFire == 1){
+            krauts[i]->dx = 0.5;
+            if(krauts[i]->x == game->rightGunner.x){
+                addBullet(krauts[i]->x, krauts[i]->y, &germanBullets);
+            };
+        };
+    }
+    //Reset test in between gunners
     else
     {
         krauts[i]->inRange = 0;
-    };
-
-    //Once in range of a target run a test to see if the kraut will fire on it
-    if(krauts[i]->inRange == 1)
-    {
-       if(krauts[i]->isFire == 0)
-       {
-         if(randomNum <= 20)
-         {
-            krauts[i]->willFire = 1;
-         }
-         krauts[i]->isFire = 1;
-       }
-    }
-    //Once out of range of a target rest the test for the next one
-    else if(krauts[i]->inRange == 0)
-    {
         krauts[i]->isFire = 0;
-    };
-
-    //Kraut Fire
-    if(krauts[i]->willFire == 1 &&
-       krauts[i]->x == game->leftGunner.x ||
-       krauts[i]->x == game->mainGunner.x ||
-       krauts[i]->x == game->rightGunner.x)
-    {
-        addBullet(krauts[i]->x, krauts[i]->y, &germanBullets);
-    };
-
-
+        krauts[i]->willFire = 0;
+        krauts[i]->dx = 1.0;
+    }
   };
 
   //---------------------------- Movement (projectile and characters) ----------------------------//
@@ -224,7 +251,7 @@ int processEvents(SDL_Window *window, Cursor *reticule, testCube *collider, Game
   for(int i=0; i<MAX_BULLETS;i++) if(bulletsLeft[i])
   {
      bulletsLeft[i]->y -= bulletsLeft[i]->dx;
-     bulletsLeft[i]->x += bulletsLeft[i]->dx;
+     //bulletsLeft[i]->x += bulletsLeft[i]->dx;
      if(bulletsLeft[i]-> y < -10 || bulletsLeft[i]-> x > 330)
         removeBullet(i, &bulletsLeft);
   };
@@ -241,7 +268,7 @@ int processEvents(SDL_Window *window, Cursor *reticule, testCube *collider, Game
   for(int i=0; i<MAX_BULLETS;i++) if(bulletsRight[i])
   {
      bulletsRight[i]->y -= bulletsRight[i]->dx;
-     bulletsRight[i]->x -= bulletsRight[i]->dx;
+     //bulletsRight[i]->x -= bulletsRight[i]->dx;
      if(bulletsRight[i]-> y < -10 || bulletsRight[i]-> x < -10)
         removeBullet(i, &bulletsRight);
   };
@@ -267,7 +294,6 @@ int processEvents(SDL_Window *window, Cursor *reticule, testCube *collider, Game
          {
             if(collide2d(bulletsLeft[k]->x, bulletsLeft[k]->y, krauts[r]->x, krauts[r]->y, 2, 2, 20, 20))
             {
-               printf("HIT HIT!\n");
                krauts[r]->dead = 1;
                removeBullet(k, &bulletsLeft);
             }
@@ -277,7 +303,6 @@ int processEvents(SDL_Window *window, Cursor *reticule, testCube *collider, Game
          {
             if(collide2d(bullets[k]->x, bullets[k]->y, krauts[r]->x, krauts[r]->y, 2, 2, 20, 20))
             {
-               printf("HIT HIT!\n");
                krauts[r]->dead = 1;
                removeBullet(k, &bullets);
             }
@@ -287,7 +312,6 @@ int processEvents(SDL_Window *window, Cursor *reticule, testCube *collider, Game
          {
             if(collide2d(bulletsRight[k]->x, bulletsRight[k]->y, krauts[r]->x, krauts[r]->y, 2, 2, 20, 20))
             {
-               printf("HIT HIT!\n");
                krauts[r]->dead = 1;
                removeBullet(k, &bulletsRight);
             }
@@ -319,7 +343,6 @@ int processEvents(SDL_Window *window, Cursor *reticule, testCube *collider, Game
             {
                 if(collide2d(bulletsLeft[k]->x, bulletsLeft[k]->y, tanks[r]->x, tanks[r]->y, 2, 2, 60, 20))
                 {
-                    printf("TANK HIT!\n");
                     tanks[r]->life -= 1;
                     removeBullet(k, &bulletsLeft);
                 }
@@ -330,7 +353,6 @@ int processEvents(SDL_Window *window, Cursor *reticule, testCube *collider, Game
              {
                 if(collide2d(bullets[k]->x, bullets[k]->y, tanks[r]->x, tanks[r]->y, 2, 2, 60, 20))
                 {
-                   printf("TANK HIT!\n");
                    tanks[r]->life -= 1;
                    removeBullet(k, &bullets);
                 }
@@ -341,7 +363,6 @@ int processEvents(SDL_Window *window, Cursor *reticule, testCube *collider, Game
             {
                 if(collide2d(bulletsRight[k]->x, bulletsRight[k]->y, tanks[r]->x, tanks[r]->y, 2, 2, 60, 20))
                 {
-                    printf("TANK HIT!\n");
                     tanks[r]->life -= 1;
                     removeBullet(k, &bulletsRight);
                 }
@@ -356,19 +377,57 @@ int processEvents(SDL_Window *window, Cursor *reticule, testCube *collider, Game
     {
         if(tanks[r]->life <= 0)
         {
-            printf("TANK DESTROYED!\n");
             killTank(r);
         }
     }
   }
+
+  //DEBUG solider shoot collide
+
+  //Left Gunner Collision Check
+  for(int r = 0; r < MAX_BULLETS; r++){
+    if(germanBullets[r]){
+        if(collide2d(germanBullets[r]->x, germanBullets[r]->y, game->leftGunner.x, game->leftGunner.y, 2, 2, 8, 8)){
+            if(game->leftGunner.selected == 1){
+                    printf("LEFT gunner hit\n");
+                    game->leftGunner.health -= 1;
+            };
+            removeBullet(r, &germanBullets);
+        };
+    }
+  };
+  //Main Gunner Collision Check
+  for(int r = 0; r < MAX_BULLETS; r++){
+    if(germanBullets[r]){
+        //Main Gunner Collision
+        if(collide2d(germanBullets[r]->x, germanBullets[r]->y, game->mainGunner.x, game->mainGunner.y, 2, 2, 8, 8)){
+            if(game->mainGunner.selected == 1){
+                    printf("MAIN gunner hit\n");
+                    game->mainGunner.health -= 1;
+            };
+            removeBullet(r, &germanBullets);
+        };
+    }
+  };
+  //Right Gunner Collision Check
+  for(int r = 0; r < MAX_BULLETS; r++){
+    if(germanBullets[r]){
+        if(collide2d(germanBullets[r]->x, germanBullets[r]->y, game->rightGunner.x, game->rightGunner.y, 2, 2, 8, 8)){
+            if(game->rightGunner.selected == 1){
+                printf("RIGHT gunner hit\n");
+                game->rightGunner.health -= 1;
+            };
+            removeBullet(r, &germanBullets);
+        };
+    }
+  };
+
 
   //DEBUG collision calibration
   /*if(collide2d(reticule->x, reticule->y, collider->x, collider->y, 2, 2, 20, 20))
   {
       printf("HIT HIT!\n");
   }*/
-
-  //TODO: KILL SOLIDERS IF THEY ARE HIT BY KRAUT BULLETS!
 
   //---------------------------- End Event ----------------------------//
   return done;
