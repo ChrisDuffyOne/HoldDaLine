@@ -73,7 +73,8 @@ int processEvents(SDL_Window *window, Cursor *reticule, testCube *collider, Game
   }
 
   // Fire Left Gunner
-  if(game->leftGunner.selected == 1 && state[SDL_SCANCODE_SPACE])
+  //if(game->leftGunner.selected == 1 && state[SDL_SCANCODE_SPACE])
+  if(game->leftGunner.selected == 1 && state[SDL_SCANCODE_SPACE] && game->leftGunner.health > 0)
   {
     game->nowFireLeft = clock();
     float diff = ((float)(game->nowFireLeft - game->lastFireLeft) / 1000000.0F ) * 1000;
@@ -90,7 +91,8 @@ int processEvents(SDL_Window *window, Cursor *reticule, testCube *collider, Game
   }
 
   // Fire Main Gunner
-  if(game->mainGunner.selected == 1 && state[SDL_SCANCODE_SPACE])
+  //if(game->mainGunner.selected == 1 && state[SDL_SCANCODE_SPACE])
+  if(game->mainGunner.selected == 1 && state[SDL_SCANCODE_SPACE] && game->mainGunner.health > 0)
   {
     game->nowFire = clock();
     float diff = ((float)(game->nowFire - game->lastFire) / 1000000.0F ) * 1000;
@@ -106,7 +108,8 @@ int processEvents(SDL_Window *window, Cursor *reticule, testCube *collider, Game
   }
 
   // Fire Right Gunner
-  if(game->rightGunner.selected == 1 && state[SDL_SCANCODE_SPACE])
+  //if(game->rightGunner.selected == 1 && state[SDL_SCANCODE_SPACE])
+  if(game->rightGunner.selected == 1 && state[SDL_SCANCODE_SPACE] && game->rightGunner.health > 0)
   {
     game->nowFireRight = clock();
     float diff = ((float)(game->nowFireRight - game->lastFireRight) / 1000000.0F ) * 1000;
@@ -220,6 +223,9 @@ int processEvents(SDL_Window *window, Cursor *reticule, testCube *collider, Game
         krauts[i]->dx = 1.0;
     }
   };
+
+  //Tank Behavior
+  //TODO!
 
   //---------------------------- Movement (projectile and characters) ----------------------------//
   //kraut movement/off-screen

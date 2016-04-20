@@ -380,7 +380,8 @@ void addBullet(float x, float y, Bullet *bulletArray[])
         bulletArray[found] = malloc(sizeof(Bullet));
         bulletArray[found]->x = x;
         bulletArray[found]->y = y;
-        bulletArray[found]->dx = 3.0;
+        //bulletArray[found]->dx = 3.0;
+        bulletArray[found]->dx = 4.0;
     }
 };
 
