@@ -25,6 +25,7 @@ int processEvents(SDL_Window *window, Cursor *reticule, testCube *collider, Game
       {
         switch(event.key.keysym.sym)
         {
+          case SDLK_F1:
           case SDLK_ESCAPE:
             done = 1;
           break;
@@ -39,31 +40,37 @@ int processEvents(SDL_Window *window, Cursor *reticule, testCube *collider, Game
 
   //---------------------------- Control Event ----------------------------//
   const Uint8 *state = SDL_GetKeyboardState(NULL);
+
+  //DEBUG Cursor Readout
+  /*if(state[SDL_SCANCODE_LEFT]){
+    reticule->x -= 1.0;
+    printf("Cursor x: %f \n", reticule->x);
+  }
+  if(state[SDL_SCANCODE_RIGHT]){
+    reticule->x += 1.0;
+    printf("Cursor x: %f \n", reticule->x);
+  }
+  if(state[SDL_SCANCODE_UP]){
+    reticule->y -= 1.0;
+    printf("Cursor y: %f \n", reticule->y);
+  }
+  if(state[SDL_SCANCODE_DOWN]){
+    reticule->y += 1.0;
+    printf("Cursor y: %f \n", reticule->y);
+  }*/
+
+  //Gunner Select
   if(state[SDL_SCANCODE_LEFT])
   {
-    reticule->x -= 1.0;
-    //printf("Cursor x: %f \n", reticule->x);
     game->leftGunner.selected = 1;
     game->mainGunner.selected = 0;
     game->rightGunner.selected = 0;
   }
   if(state[SDL_SCANCODE_RIGHT])
   {
-    reticule->x += 1.0;
-    //printf("Cursor x: %f \n", reticule->x);
     game->leftGunner.selected = 0;
     game->mainGunner.selected = 0;
     game->rightGunner.selected = 1;
-  }
-  if(state[SDL_SCANCODE_UP])
-  {
-    reticule->y -= 1.0;
-    //printf("Cursor y: %f \n", reticule->y);
-  }
-  if(state[SDL_SCANCODE_DOWN])
-  {
-     reticule->y += 1.0;
-     //printf("Cursor y: %f \n", reticule->y);
   }
   if(!state[SDL_SCANCODE_LEFT] && !state[SDL_SCANCODE_RIGHT])
   {
@@ -73,14 +80,12 @@ int processEvents(SDL_Window *window, Cursor *reticule, testCube *collider, Game
   }
 
   // Fire Left Gunner
-  //if(game->leftGunner.selected == 1 && state[SDL_SCANCODE_SPACE])
   if(game->leftGunner.selected == 1 && state[SDL_SCANCODE_SPACE] && game->leftGunner.health > 0)
   {
     game->nowFireLeft = clock();
     float diff = ((float)(game->nowFireLeft - game->lastFireLeft) / 1000000.0F ) * 1000;
-    if(diff > 1.00)
+    if(diff > 0.20)
     {
-        //addBullet(7.0, 230.0, &bulletsLeft);
         addBullet(game->leftGunner.x+4, 230.0, &bulletsLeft);
         game->lastFireLeft = game->nowFireLeft;
     };
@@ -91,12 +96,11 @@ int processEvents(SDL_Window *window, Cursor *reticule, testCube *collider, Game
   }
 
   // Fire Main Gunner
-  //if(game->mainGunner.selected == 1 && state[SDL_SCANCODE_SPACE])
   if(game->mainGunner.selected == 1 && state[SDL_SCANCODE_SPACE] && game->mainGunner.health > 0)
   {
     game->nowFire = clock();
     float diff = ((float)(game->nowFire - game->lastFire) / 1000000.0F ) * 1000;
-    if(diff > 0.15)
+    if(diff > 0.10)
     {
         addBullet(163.0, 230.0, &bullets);
         game->lastFire = game->nowFire;
@@ -108,14 +112,12 @@ int processEvents(SDL_Window *window, Cursor *reticule, testCube *collider, Game
   }
 
   // Fire Right Gunner
-  //if(game->rightGunner.selected == 1 && state[SDL_SCANCODE_SPACE])
   if(game->rightGunner.selected == 1 && state[SDL_SCANCODE_SPACE] && game->rightGunner.health > 0)
   {
     game->nowFireRight = clock();
     float diff = ((float)(game->nowFireRight - game->lastFireRight) / 1000000.0F ) * 1000;
-    if(diff > 1.00)
+    if(diff > 0.20)
     {
-        //addBullet(316.0, 230.0, &bulletsRight);
         addBullet(game->rightGunner.x+4, 230.0, &bulletsRight);
         game->lastFireRight = game->nowFireRight;
     };
@@ -237,6 +239,18 @@ int processEvents(SDL_Window *window, Cursor *reticule, testCube *collider, Game
      else if(krauts[i]->y == 120.00)
         krauts[i]->x += krauts[i]->dx;
 
+     //sprite swap
+     krauts[i]->nowKrautSprite = clock();
+     float diff = ((float)(krauts[i]->nowKrautSprite - krauts[i]->lastKrautSprite) / 1000000.0F ) * 1000;
+     if(diff > 0.25)
+     {
+        krauts[i]->currentSprite++;
+        if(krauts[i]->currentSprite > 3)
+            krauts[i]->currentSprite = 0;
+        krauts[i]->lastKrautSprite = krauts[i]->nowKrautSprite;
+     }
+
+
      if(krauts[i]->x < -20.0 || krauts[i]->x > 340.0)
      {
         killKraut(i);
@@ -247,25 +261,39 @@ int processEvents(SDL_Window *window, Cursor *reticule, testCube *collider, Game
   for(int i=0; i<MAX_TANKS;i++) if(tanks[i])
   {
     tanks[i]->x -= tanks[i]->dx;
-    if(tanks[i]->x < -20.0 || tanks[i]->x > 340.0)
+
+    //sprite swap
+    tanks[i]->nowTankSprite = clock();
+    float diff = ((float)(tanks[i]->nowTankSprite - tanks[i]->lastTankSprite) / 1000000.0F ) * 1000;
+    if(diff > 0.5)
     {
-        killTank(i);
+        tanks[i]->currentSprite++;
+        if(tanks[i]->currentSprite > 4)
+            tanks[i]->currentSprite = 0;
+        tanks[i]->lastTankSprite = tanks[i]->nowTankSprite;
     }
+
+    if(tanks[i]->x < -20.0 || tanks[i]->x > 340.0)
+        killTank(i);
+
   };
 
   //bullet left movement/off-screen
   for(int i=0; i<MAX_BULLETS;i++) if(bulletsLeft[i])
   {
      bulletsLeft[i]->y -= bulletsLeft[i]->dx;
-     //bulletsLeft[i]->x += bulletsLeft[i]->dx;
      if(bulletsLeft[i]-> y < -10 || bulletsLeft[i]-> x > 330)
         removeBullet(i, &bulletsLeft);
   };
 
-  //bullet movement/off-screen
+  //bullet main movement/off-screen
   for(int i=0; i<MAX_BULLETS;i++) if(bullets[i])
   {
      bullets[i]->y -= bullets[i]->dx;
+
+     //DEBUG //Add spread to bullets
+     bullets[i]->x += bullets[i]->spread;
+
      if(bullets[i]->y < -10)
         removeBullet(i, &bullets);
   };
@@ -274,7 +302,6 @@ int processEvents(SDL_Window *window, Cursor *reticule, testCube *collider, Game
   for(int i=0; i<MAX_BULLETS;i++) if(bulletsRight[i])
   {
      bulletsRight[i]->y -= bulletsRight[i]->dx;
-     //bulletsRight[i]->x -= bulletsRight[i]->dx;
      if(bulletsRight[i]-> y < -10 || bulletsRight[i]-> x < -10)
         removeBullet(i, &bulletsRight);
   };

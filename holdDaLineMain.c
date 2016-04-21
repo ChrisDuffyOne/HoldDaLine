@@ -15,6 +15,8 @@ typedef struct
   float x;
   float y;
   float dx;
+  //Debug
+  float spread;
 }Bullet;
 
 typedef struct
@@ -26,7 +28,14 @@ typedef struct
    int isFire; //Whenever Kraut enters a killzone will run a test to see if kraut will fire. Once run isFire will prevent it from running again
    int willFire; //Indicates if Kraut will fire
    int dead;
+
+   //DEBUG
+   clock_t lastKrautSprite;
+   clock_t nowKrautSprite;
+   int currentSprite;
 }Kraut;
+//DEBUG
+SDL_Texture *krautTexture;
 
 typedef struct
 {
@@ -35,7 +44,11 @@ typedef struct
    float dx;
    int life;
    int dead;
+   clock_t lastTankSprite;
+   clock_t nowTankSprite;
+   int currentSprite;
 }Tank;
+SDL_Texture *tankTexture;
 
 typedef struct
 {
@@ -96,7 +109,7 @@ typedef struct
   clock_t lastkrtSpawn;
   clock_t nowkrtSpawn;
 
-  //DEBUG Tank Spawn timers
+  //Tank Spawn timers
   clock_t lastTankSpawn;
   clock_t nowTankSpawn;
 

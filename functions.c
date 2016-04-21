@@ -307,6 +307,9 @@ void spawnKraut(float x, float y)
         krauts[found]->isFire = 0;
         krauts[found]->willFire = 0;
         krauts[found]->dead = 0;
+        //DEBUG
+        krauts[found]->lastKrautSprite = clock();
+        krauts[found]->currentSprite = 0;
     }
 };
 
@@ -323,7 +326,7 @@ void killKraut(int i)
 }
 
 /*-----------------------------------------------------
-        DEBUG SPAWNTANK
+        SPAWNTANK
 -----------------------------------------------------*/
 void spawnTank(float x, float y)
 {
@@ -346,6 +349,9 @@ void spawnTank(float x, float y)
         tanks[found]->dx = 1.0;
         tanks[found]->life = 4;
         tanks[found]->dead = 0;
+        //DEBUG
+        tanks[found]->lastTankSprite = clock();
+        tanks[found]->currentSprite = 0;
     }
 }
 /*-----------------------------------------------------
@@ -377,11 +383,19 @@ void addBullet(float x, float y, Bullet *bulletArray[])
 
     if(found >= 0)
     {
+        //DEBUG Assign Spread
+        float spreadNum = ((float)rand()/(float)(RAND_MAX)) * 2.5;
+        int randomNum = rand() % 2;
+        if(randomNum == 1)
+            spreadNum = -spreadNum;
+
         bulletArray[found] = malloc(sizeof(Bullet));
         bulletArray[found]->x = x;
         bulletArray[found]->y = y;
-        //bulletArray[found]->dx = 3.0;
         bulletArray[found]->dx = 4.0;
+
+        //DEBUG
+        bulletArray[found]->spread = spreadNum;
     }
 };
 
@@ -427,7 +441,7 @@ void loadGamestate(Gamestate *game, SDL_Renderer *renderer)
     strcat(fontPath, "fonts/Crazy-Pixel.ttf");
     game->font = TTF_OpenFont(fontPath, 48);
 
-    //DEBUG Load Char Sprites
+    //Load Char Sprites
     //Title
     char *titlePath = SDL_GetBasePath();
     strcat(titlePath, "pngs/hdlTitle.png");
@@ -447,6 +461,26 @@ void loadGamestate(Gamestate *game, SDL_Renderer *renderer)
 
     game->soliderRedText = SDL_CreateTextureFromSurface(renderer, soliderRed);
     SDL_FreeSurface(soliderRed);
+
+    //Tank
+    char *tankPath = SDL_GetBasePath();
+    strcat(tankPath, "pngs/sheetTank.png");
+
+    SDL_Surface *tankSurface = NULL;
+    tankSurface = IMG_Load(tankPath);
+
+    tankTexture = SDL_CreateTextureFromSurface(renderer, tankSurface);
+    SDL_FreeSurface(tankSurface);
+
+    //DEBUG Kraut
+    char *krautPath = SDL_GetBasePath();
+    strcat(krautPath, "pngs/sheetKraut.png");
+
+    SDL_Surface *krautSurface = NULL;
+    krautSurface = IMG_Load(krautPath);
+
+    krautTexture = SDL_CreateTextureFromSurface(renderer, krautSurface);
+    SDL_FreeSurface(krautSurface);
 
     //Title Movement
     game->titleY = -98.0;
