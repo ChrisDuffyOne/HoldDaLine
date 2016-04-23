@@ -42,7 +42,7 @@ int processEvents(SDL_Window *window, Cursor *reticule, testCube *collider, Game
   const Uint8 *state = SDL_GetKeyboardState(NULL);
 
   //DEBUG Cursor Readout
-  /*if(state[SDL_SCANCODE_LEFT]){
+  if(state[SDL_SCANCODE_LEFT]){
     reticule->x -= 1.0;
     printf("Cursor x: %f \n", reticule->x);
   }
@@ -57,7 +57,7 @@ int processEvents(SDL_Window *window, Cursor *reticule, testCube *collider, Game
   if(state[SDL_SCANCODE_DOWN]){
     reticule->y += 1.0;
     printf("Cursor y: %f \n", reticule->y);
-  }*/
+  }
 
   //Gunner Select
   if(state[SDL_SCANCODE_LEFT])
@@ -244,10 +244,28 @@ int processEvents(SDL_Window *window, Cursor *reticule, testCube *collider, Game
      float diff = ((float)(krauts[i]->nowKrautSprite - krauts[i]->lastKrautSprite) / 1000000.0F ) * 1000;
      if(diff > 0.25)
      {
-        krauts[i]->currentSprite++;
-        if(krauts[i]->currentSprite > 3)
-            krauts[i]->currentSprite = 0;
-        krauts[i]->lastKrautSprite = krauts[i]->nowKrautSprite;
+        //Aiming Mode
+        if(krauts[i]->willFire == 1)
+        {
+            krauts[i]->currentSprite++;
+            //skip ahead to the aiming part of the sheet if not there
+            if(krauts[i]->currentSprite < 4)
+                krauts[i]->currentSprite = 4;
+            //reset to the aiming section of the strip if done
+            if(krauts[i]->currentSprite > 6)
+                krauts[i]->currentSprite = 4;
+
+            krauts[i]->lastKrautSprite = krauts[i]->nowKrautSprite;
+        }
+        //Running Mode
+        else
+        {
+            krauts[i]->currentSprite++;
+            //reset to the section of the strip if done
+            if(krauts[i]->currentSprite > 3)
+                krauts[i]->currentSprite = 0;
+            krauts[i]->lastKrautSprite = krauts[i]->nowKrautSprite;
+        }
      }
 
 
@@ -325,7 +343,7 @@ int processEvents(SDL_Window *window, Cursor *reticule, testCube *collider, Game
          //left bullet collide
          if(bulletsLeft[k])
          {
-            if(collide2d(bulletsLeft[k]->x, bulletsLeft[k]->y, krauts[r]->x, krauts[r]->y, 2, 2, 20, 20))
+            if(collide2d(bulletsLeft[k]->x, bulletsLeft[k]->y, krauts[r]->x, krauts[r]->y, 2, 2, 39, 50))
             {
                krauts[r]->dead = 1;
                removeBullet(k, &bulletsLeft);
@@ -334,7 +352,7 @@ int processEvents(SDL_Window *window, Cursor *reticule, testCube *collider, Game
          //main bullet collide
          if(bullets[k])
          {
-            if(collide2d(bullets[k]->x, bullets[k]->y, krauts[r]->x, krauts[r]->y, 2, 2, 20, 20))
+            if(collide2d(bullets[k]->x, bullets[k]->y, krauts[r]->x, krauts[r]->y, 2, 2, 39, 50))
             {
                krauts[r]->dead = 1;
                removeBullet(k, &bullets);
@@ -343,7 +361,7 @@ int processEvents(SDL_Window *window, Cursor *reticule, testCube *collider, Game
          //right bullet collide
          if(bulletsRight[k])
          {
-            if(collide2d(bulletsRight[k]->x, bulletsRight[k]->y, krauts[r]->x, krauts[r]->y, 2, 2, 20, 20))
+            if(collide2d(bulletsRight[k]->x, bulletsRight[k]->y, krauts[r]->x, krauts[r]->y, 2, 2, 39, 50))
             {
                krauts[r]->dead = 1;
                removeBullet(k, &bulletsRight);

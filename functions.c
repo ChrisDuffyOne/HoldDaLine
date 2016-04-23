@@ -215,7 +215,7 @@ void redScreen(SDL_Renderer *renderer, SDL_Window *window){
 /*-----------------------------------------------------
         GAMESCREEN
 -----------------------------------------------------*/
-void gameScreen(SDL_Renderer *renderer, SDL_Window *window){
+/*void gameScreen(SDL_Renderer *renderer, SDL_Window *window){
   //PATH game
   char *imgPath = SDL_GetBasePath();
   strcat(imgPath, "pngs/gameScreen_320.png");
@@ -239,7 +239,7 @@ void gameScreen(SDL_Renderer *renderer, SDL_Window *window){
   SDL_RenderPresent(renderer);
 
   SDL_Delay(10000);
-};
+};*/
 
 /*-----------------------------------------------------
         COLLIDE2D
@@ -252,13 +252,7 @@ int collide2d(float x1, float y1, float x2, float y2, float wt1, float ht1, floa
 /*-----------------------------------------------------
         LOADINGSCREEN
 -----------------------------------------------------*/
-void loadingScreen(SDL_Renderer *renderer, SDL_Window *window, Gamestate *game){
-
-  //Make type
-  /*TTF_Font *font;
-  char *fontPath = SDL_GetBasePath();
-  strcat(fontPath, "fonts/Crazy-Pixel.ttf");
-  font = TTF_OpenFont(fontPath, 48);*/
+/*void loadingScreen(SDL_Renderer *renderer, SDL_Window *window, Gamestate *game){
 
   SDL_Color white = {255, 255, 255, 255};
   SDL_Surface *temp = TTF_RenderText_Blended(game->font,"SpunkWar",white);
@@ -280,7 +274,7 @@ void loadingScreen(SDL_Renderer *renderer, SDL_Window *window, Gamestate *game){
 
   //End Processes
   SDL_DestroyTexture(label);
-}
+}*/
 
 /*-----------------------------------------------------
         SPAWNKRAUT
@@ -314,7 +308,7 @@ void spawnKraut(float x, float y)
 };
 
 /*-----------------------------------------------------
-        KILLKRAUT
+        KILL_KRAUT
 -----------------------------------------------------*/
 void killKraut(int i)
 {
@@ -326,7 +320,7 @@ void killKraut(int i)
 }
 
 /*-----------------------------------------------------
-        SPAWNTANK
+        SPAWN_TANK
 -----------------------------------------------------*/
 void spawnTank(float x, float y)
 {
@@ -355,7 +349,7 @@ void spawnTank(float x, float y)
     }
 }
 /*-----------------------------------------------------
-        DEBUG KILLTANK
+        KILL_TANK
 -----------------------------------------------------*/
 void killTank(int i)
 {
@@ -367,7 +361,7 @@ void killTank(int i)
 }
 
 /*-----------------------------------------------------
-        ADDBULLET
+        ADD_BULLET
 -----------------------------------------------------*/
 void addBullet(float x, float y, Bullet *bulletArray[])
 {
@@ -383,9 +377,9 @@ void addBullet(float x, float y, Bullet *bulletArray[])
 
     if(found >= 0)
     {
-        //DEBUG Assign Spread
-        float spreadNum = ((float)rand()/(float)(RAND_MAX)) * 2.5;
-        int randomNum = rand() % 2;
+        //Calculate Spread
+        float spreadNum = ((float)rand()/(float)(RAND_MAX)) * 1; //2.5
+        int randomNum = rand() % 2; //Needed to decide whether bullet vears left or right
         if(randomNum == 1)
             spreadNum = -spreadNum;
 
@@ -393,14 +387,12 @@ void addBullet(float x, float y, Bullet *bulletArray[])
         bulletArray[found]->x = x;
         bulletArray[found]->y = y;
         bulletArray[found]->dx = 4.0;
-
-        //DEBUG
         bulletArray[found]->spread = spreadNum;
     }
 };
 
 /*-----------------------------------------------------
-        REMOVEBULLET
+        REMOVE_BULLET
 -----------------------------------------------------*/
 void removeBullet(int k, Bullet *bulletArray[])
 {
@@ -441,7 +433,7 @@ void loadGamestate(Gamestate *game, SDL_Renderer *renderer)
     strcat(fontPath, "fonts/Crazy-Pixel.ttf");
     game->font = TTF_OpenFont(fontPath, 48);
 
-    //Load Char Sprites
+    //-------LOAD CHARACTER SPRITES-------//
     //Title
     char *titlePath = SDL_GetBasePath();
     strcat(titlePath, "pngs/hdlTitle.png");
@@ -472,7 +464,7 @@ void loadGamestate(Gamestate *game, SDL_Renderer *renderer)
     tankTexture = SDL_CreateTextureFromSurface(renderer, tankSurface);
     SDL_FreeSurface(tankSurface);
 
-    //DEBUG Kraut
+    //Kraut
     char *krautPath = SDL_GetBasePath();
     strcat(krautPath, "pngs/sheetKraut.png");
 
@@ -481,6 +473,27 @@ void loadGamestate(Gamestate *game, SDL_Renderer *renderer)
 
     krautTexture = SDL_CreateTextureFromSurface(renderer, krautSurface);
     SDL_FreeSurface(krautSurface);
+
+    //-------LOAD GAMESCREEN ASSETS-------//
+    //Skyline
+    char *skylinePath = SDL_GetBasePath();
+    strcat(skylinePath, "pngs/sheetSkyline.png");
+
+    SDL_Surface *skylineSurface = NULL;
+    skylineSurface = IMG_Load(skylinePath);
+
+    game->skylineText = SDL_CreateTextureFromSurface(renderer, skylineSurface);
+    SDL_FreeSurface(skylineSurface);
+
+    //Cover
+    char *coverPath = SDL_GetBasePath();
+    strcat(coverPath, "pngs/sheetCover.png");
+
+    SDL_Surface *coverSurface = NULL;
+    coverSurface = IMG_Load(coverPath);
+
+    game->coverText = SDL_CreateTextureFromSurface(renderer, coverSurface);
+    SDL_FreeSurface(coverSurface);
 
     //Title Movement
     game->titleY = -98.0;
@@ -509,4 +522,6 @@ void dumpGamestate(Gamestate *game)
 {
     SDL_DestroyTexture(game->titleBlocText);
     SDL_DestroyTexture(game->soliderRedText);
+
+    //TODO! Need to destroy additional textures
 };

@@ -85,6 +85,10 @@ typedef struct
   SDL_Texture *titleBlocText;
   SDL_Texture *soliderRedText;
 
+  //DEBUG gameScreenAssets
+  SDL_Texture *skylineText;
+  SDL_Texture *coverText;
+
   //Animation Data for titleBloc and SoliderRed
   float titleY;
   float titleDX;
@@ -147,8 +151,8 @@ int main(int argc, char *argv[])
                               SDL_WINDOWPOS_UNDEFINED,  // Initial y position
                               320,                      // Width in pixels
                               240,                      // Height in pixels
-                              0                         // Flags
-                              //SDL_WINDOW_FULLSCREEN
+                              //0                         // Flags
+                              SDL_WINDOW_FULLSCREEN
                               );
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
@@ -196,18 +200,3 @@ int main(int argc, char *argv[])
 
     return 0;
 }
-
-//--------------------TRASH CODE---------------------//
-/*
-     //RED SCREEN
-    redScreen(renderer, window);
-    //GAME SCREEN
-    gameScreen(renderer, window);
-
-    //LOADING SCREEN
-    //loadingScreen(renderer, window);
-
-    //titleScreen(renderer, window);
-    //DEBUG LOADING SCREEN
-    //loadingScreen(renderer, window, &game);
-*/

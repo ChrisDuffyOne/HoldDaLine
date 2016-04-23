@@ -8,9 +8,35 @@ void doRender(SDL_Renderer *renderer, Cursor *reticule, testCube *testBox, Games
     SDL_RenderClear(renderer);
 
     //DEBUG Cursor render
-    /*SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
+    SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
     SDL_Rect rect = {reticule->x, reticule->y, 2, 2};
-    SDL_RenderFillRect(renderer, &rect);*/
+    SDL_RenderFillRect(renderer, &rect);
+
+    //Skyline Render
+    SDL_Rect skylineRect = { 0, 19, 320, 47};
+    SDL_RenderCopy(renderer, game->skylineText, NULL, &skylineRect);
+
+    //main kraut render
+    for(int i=0; i< MAX_KRAUTS; i++) if(krauts[i])
+    {
+        /*if(krauts[i]->willFire == 1)
+            SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+        else
+            SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+        SDL_Rect krautRun = { krauts[i]->x, krauts[i]->y, 20, 20};
+        SDL_RenderFillRect(renderer, &krautRun);*/
+
+        SDL_Rect eSrcRect = {39*krauts[i]->currentSprite, 0, 39, 50};
+        SDL_Rect eRect = {krauts[i]->x, krauts[i]->y, 39, 50};
+        if(krauts[i]->y == 160.00)
+            SDL_RenderCopyEx(renderer, krautTexture, &eSrcRect, &eRect, 0, NULL, 1);
+        else
+            SDL_RenderCopyEx(renderer, krautTexture, &eSrcRect, &eRect, 0, NULL, 0);
+    };
+
+    //Cover Render
+    SDL_Rect coverRect = { 0, 155, 320, 85};
+    SDL_RenderCopy(renderer, game->coverText, NULL, &coverRect);
 
     //left solider render
     SDL_Rect leftGunner = { game->leftGunner.x, game->leftGunner.y, 8, 8};
@@ -64,38 +90,16 @@ void doRender(SDL_Renderer *renderer, Cursor *reticule, testCube *testBox, Games
         SDL_RenderFillRect(renderer, &bulletTry);
     };
 
-    //main kraut render
-    for(int i=0; i< MAX_KRAUTS; i++) if(krauts[i])
-    {
-        /*if(krauts[i]->willFire == 1)
-            SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-        else
-            SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-        SDL_Rect krautRun = { krauts[i]->x, krauts[i]->y, 20, 20};
-        SDL_RenderFillRect(renderer, &krautRun);*/
-
-        SDL_Rect eSrcRect = {39*krauts[i]->currentSprite, 0, 39, 50};
-        SDL_Rect eRect = {krauts[i]->x, krauts[i]->y, 39, 50};
-        if(krauts[i]->y == 160.00)
-            SDL_RenderCopyEx(renderer, krautTexture, &eSrcRect, &eRect, 0, NULL, 1);
-        else
-            SDL_RenderCopyEx(renderer, krautTexture, &eSrcRect, &eRect, 0, NULL, 0);
-    };
 
     //main tank render
     for(int i=0; i< MAX_TANKS; i++) if(tanks[i])
     {
-        //DEBUG
-        /*SDL_SetRenderDrawColor(renderer, 163, 44, 184, 255);
-        SDL_Rect tankRun = { tanks[i]->x, tanks[i]->y, 60, 20};
-        SDL_RenderFillRect(renderer, &tankRun);*/
-
         SDL_Rect eSrcRect = {115*tanks[i]->currentSprite, 0, 115, 42};
         SDL_Rect eRect = {tanks[i]->x, tanks[i]->y, 115, 42};
         SDL_RenderCopyEx(renderer, tankTexture, &eSrcRect, &eRect, 0, NULL, 1);
     };
 
-    //DEBUG germanbullets render
+    //germanbullets render
     for(int i=0; i<MAX_BULLETS;i++) if(germanBullets[i])
     {
         SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
